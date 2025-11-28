@@ -1,33 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { AuthProvider } from "./context/AuthContext"
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
+import { Auth } from "./pages/Auth"
+import { UserDashboard } from "./pages/UserDashboard"
+import { ProtectedRoute } from "./components/ProtectedRoute"
+import { AdminDashboard } from "./pages/AdminDashboard"
+import { Solicitud } from "./pages/Solicitud"
+import { Inventario } from "./pages/Inventario"
+import { Metricas } from "./pages/Metricas"
+import { GestionUsuarios } from "./pages/GestionUsuarios"
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <AuthProvider>
+        <Router>
+          <Routes>
+
+            {/* Rutas públicas */}
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Rutas protegidas */}
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute>
+                  <UserDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="solicitud" 
+              element={
+                <ProtectedRoute>
+                  <Solicitud />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/inventario" 
+              element={
+                <ProtectedRoute>
+                  <Inventario />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Rutas protegidas por rol */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/metricas" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <Metricas />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/gestion-usuarios" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <GestionUsuarios />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Rutas desconocidas o forzadas */}
+            <Route path="*" element={<Navigate to="/Auth" replace />} />
+            
+          </Routes>
+        </Router>
+      </AuthProvider>
     </>
   )
 }
