@@ -8,6 +8,7 @@ import { Solicitud } from "./pages/Solicitud"
 import { Inventario } from "./pages/Inventario"
 import { Metricas } from "./pages/Metricas"
 import { GestionUsuarios } from "./pages/GestionUsuarios"
+import { InventarioPro } from "./pages/InventarioPro"
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
             
             {/* Rutas protegidas */}
             <Route 
-              path="/" 
+              path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <UserDashboard />
@@ -49,7 +50,7 @@ function App() {
             
             {/* Rutas protegidas por rol */}
             <Route 
-              path="/admin" 
+              path="/admin/solicitudes" 
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminDashboard />
@@ -58,7 +59,7 @@ function App() {
             />
 
             <Route 
-              path="/metricas" 
+              path="/admin/metricas" 
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <Metricas />
@@ -67,10 +68,19 @@ function App() {
             />
 
             <Route 
-              path="/gestion-usuarios" 
+              path="/admin/gestion-usuarios" 
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <GestionUsuarios />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/admin/inventarioPro" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <InventarioPro />
                 </ProtectedRoute>
               } 
             />

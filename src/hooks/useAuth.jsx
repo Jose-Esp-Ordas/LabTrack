@@ -7,7 +7,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 
 export const useAuth = () => {
   const [user, setUser] = useState(null)
-  const [userRole, setUserRole] = useState(null)
+  const [userRole, setUserRole] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -33,14 +33,14 @@ export const useAuth = () => {
   const Register = async (email, password, role="user") => {
     try {
       setLoading(true)
+      setError("")
       const  userCredential  = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "users", userCredential.user.uid), { 
-        role,
+        role: role,
         email: email,
         createdAt: new Date()
       });
-      const userDoc = await getDoc(doc(db, "users", userCredential.user.uid))
-      setUserRole(userDoc.data().role)
+      setUserRole(role)
       setLoading(false)
       return { success: true, user: userCredential.user }
     } catch (error) {
@@ -55,8 +55,8 @@ export const useAuth = () => {
       setLoading(true)
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       const userDoc = await getDoc(doc(db, "users", userCredential.user.uid))
+      setUserRole(userDoc.data().role)
       setLoading(false)
-      if (userDoc.exists()) setUserRole(userDoc.data().role)
         return { success: true, user: userCredential.user }
     } catch (error) {
       setError(error.message)
@@ -69,7 +69,6 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await signOut(auth)
-      setUser(null)
       setUserRole(null)
     } catch (error) {
       setError(error.message)
