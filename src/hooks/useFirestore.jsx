@@ -10,6 +10,7 @@ import {
     orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
+import { Lasso } from "lucide-react";
 
 // @param {string} collectionName - Nombre de la colección de Firestore
 export const useFirestore = (collectionName) => {
@@ -80,7 +81,56 @@ export const useFirestore = (collectionName) => {
         }
     };
 
+    //agregar a coleccion
+    const addToCollection = async (data) => {
+        try {
+            let path = collectionName+"/"+data.parentId+"/"+data.subCollection;
+            const docRef = await addDoc(collection(db, path), {
+                sku: data.sku,
+                lastUpdated: data.lastUpdated,
+                addedAt: new Date(),
+                estado: "disponible",
+            });
+            return { success: true, id: docRef.id };
+        } catch (err) {
+            console.error("Error al agregar a colección: ", err);
+            return { success: false, error: err.message };
+        }
+    };
 
-    return { documents, loading, error, addDocument, deleteDocument, updateDocument };
+    // obtener subcolección
+    const getSubcollection = async (parentId, subCollectionName) => {
+        try {
+            let path = collectionName+"/"+parentId+"/"+subCollectionName;
+            const q = query(
+                collection(db, path),
+                orderBy("addedAt", "desc")
+            );
+            const snapshot = await getDocs(q);
+            const docs = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            return { success: true, documents: docs };
+        } catch (err) {
+            console.error("Error al obtener subcolección: ", err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    //Editar en subcolección
+    const updateInSubcollection = async (parentId, subCollectionName, docId, data) => {
+        try {
+            let path = collectionName+"/"+parentId+"/"+subCollectionName;
+            const docRef = doc(db, path, docId);
+            await updateDoc(docRef, data);
+            return { success: true };
+        } catch (err) {
+            console.error("Error al actualizar en subcolección: ", err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    return { documents, loading, error, addDocument, deleteDocument, updateDocument, addToCollection, getSubcollection, updateInSubcollection };
     
 };
