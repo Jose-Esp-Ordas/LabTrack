@@ -1,34 +1,19 @@
 import React, { useState, useEffect, use } from 'react'
 import { useMaterialContext } from '@/context/MaterialContext';
-import { Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, ChevronUp, CirclePlus,  } from 'lucide-react';
 import { useStorage } from '@/hooks/useStorage';
 import { Button } from "@/components/ui/button"
 import { MaterialModal } from '@/components/MaterialModal';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Instancias } from './Instancias';
-import { updateDoc } from 'firebase/firestore';
 
-export const ListaInventario = ({material, instancias, handleEdit}) => {
+export const ListaInventario = ({material, instancias, handleEdit, userRole}) => {
 
     const { loading, error, deleteDocument, updateEstadoInstancia } = useMaterialContext();
     const { deleteFile } = useStorage();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [disponibles, setDisponibles] = useState(0);
+    const [disponibles, setDisponibles] = useState(instancias.filter(inst => inst.estado === "Disponible").length);
     const totales = instancias.length;
     
-    useEffect(() => {
-        const disponibles = instancias.filter(inst => inst.estado === "Disponible").length;
-        setDisponibles(disponibles);
-    }, []);
-
     const handleDelete = async () => {
         if (window.confirm(`¿Estás seguro de eliminar "${material.nombre}"? Esto eliminará todas las instancias.`)) {
             const result = await deleteDocument(material.id);
@@ -46,7 +31,12 @@ export const ListaInventario = ({material, instancias, handleEdit}) => {
 
     const updateInstancia = async (instId, newEstado) => {
         try {
-            result = updateEstadoInstancia(material.id, "instancias", instId, newEstado);
+            if (newEstado === "Disponible") {
+                setDisponibles(prev => prev + 1);
+            } else if (instancias.find(inst => inst.id === instId).estado === "Disponible") {
+                setDisponibles(prev => prev - 1);
+            }
+            const result = await updateEstadoInstancia(material.id, "instancias", instId, newEstado);
             if (!result.success) {
                 alert("Error al actualizar estado: " + result.error);
             }
@@ -95,27 +85,42 @@ export const ListaInventario = ({material, instancias, handleEdit}) => {
                         <span className='font-semibold'>Totales: </span>
                         <span>{totales}</span>
                     </div>
-                    
-                    <MaterialModal loading={loading} editMode={true} existingData={{...material,totales}} onAddMaterial={handleEdit}
-                        button={
-                        <Button 
-                            className='p-2 hover:bg-blue-100 rounded transition-colors cursor-pointer'
-                            title='Editar'
-                            disabled={loading}
-                            onClick={(e) => {e.stopPropagation()}}
-                        >
-                            <Pencil size={18} className='text-blue-600' />
-                        </Button>
-                        }/>
+                    {userRole === "admin" && (
+                        <>
+                            <MaterialModal loading={loading} editMode={true} existingData={{...material,totales}} onAddMaterial={handleEdit}
+                                button={
+                                <Button 
+                                    className='p-2 hover:bg-blue-100 rounded transition-colors cursor-pointer'
+                                    title='Editar'
+                                    disabled={loading}
+                                    onClick={(e) => {e.stopPropagation()}}
+                                >
+                                    <Pencil size={18} className='text-blue-600' />
+                                </Button>
+                                }/>
 
-                    <button 
-                        onClick={handleDelete}
-                        className='p-2 hover:bg-red-100 rounded transition-colors cursor-pointer'
-                        title='Eliminar'
-                        disabled={loading}
-                    >
-                        <Trash2 size={18} className='text-red-600' />
-                    </button>
+                            <button 
+                                onClick={handleDelete}
+                                className='p-2 hover:bg-red-100 rounded transition-colors cursor-pointer'
+                                title='Eliminar'
+                                disabled={loading}
+                            >
+                                <Trash2 size={18} className='text-red-600' />
+                            </button>
+                        </>
+                    )}
+                    {userRole !== "admin" && (
+                        <>
+                        <button 
+                                onClick={() => {}}
+                                className='p-2 hover:bg-red-100 rounded transition-colors cursor-pointer'
+                                title='add'
+                                disabled={loading}
+                            >
+                                <CirclePlus size={18} className='text-blue-600' />
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
             
@@ -129,7 +134,7 @@ export const ListaInventario = ({material, instancias, handleEdit}) => {
                             <div className='grid grid-cols-3 gap-2 mr-2'>
                                 {instancias.map((inst, idx) => (
                                     <div key={idx} className='p-2 bg-gray-50 rounded text-sm'>
-                                        <Instancias inst={inst} updateEstadoInstancia={updateInstancia} />
+                                        <Instancias inst={inst} updateEstadoInstancia={updateInstancia} userRole={userRole} />
                                     </div>
                                 ))}
                             </div>

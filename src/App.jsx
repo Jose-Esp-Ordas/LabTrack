@@ -8,7 +8,6 @@ import { Solicitud } from "./pages/Solicitud"
 import { Inventario } from "./pages/Inventario"
 import { Metricas } from "./pages/Metricas"
 import { GestionUsuarios } from "./pages/GestionUsuarios"
-import { InventarioPro } from "./pages/InventarioPro"
 import { MaterialProvider } from "./context/MaterialContext"
 
 function App() {
@@ -44,12 +43,12 @@ function App() {
               <Route 
                 path="/inventario" 
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute >
                     <Inventario />
                   </ProtectedRoute>
                 } 
               />
-              
+
               {/* Rutas protegidas por rol */}
               <Route 
                 path="/admin/solicitudes" 
@@ -78,14 +77,7 @@ function App() {
                 } 
               />
 
-              <Route 
-                path="/admin/inventarioPro" 
-                element={
-                  <ProtectedRoute requireAdmin={true}>
-                    <InventarioPro />
-                  </ProtectedRoute>
-                } 
-              />
+              
               
               {/* Rutas desconocidas o forzadas */}
               <Route path="*" element={<Navigate to="/Auth" replace />} />

@@ -123,7 +123,13 @@ export const useFirestore = (collectionName) => {
         try {
             let path = collectionName+"/"+parentId+"/"+subCollectionName;
             const docRef = doc(db, path, docId);
-            await updateDoc(docRef, { estado: newEstado });
+            let payload = {};
+            if (newEstado === "Mantenimiento") 
+                payload = { lastUpdated: [...(docRef.lastUpdated || []), new Date()] };
+            if (newEstado === "Prestado")
+                payload = { prestamos: docRef.prestamos ? docRef.prestamos + 1 : 1 };
+            
+            await updateDoc(docRef, { estado: newEstado, ...payload });
             return { success: true };
         } catch (err) {
             console.error("Error al actualizar estado: ", err);
