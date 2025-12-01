@@ -1,41 +1,65 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import { useMaterialContext } from '@/context/MaterialContext';
 import { Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { useStorage } from '@/hooks/useStorage';
+import { Button } from "@/components/ui/button"
+import { MaterialModal } from '@/components/MaterialModal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Instancias } from './Instancias';
+import { updateDoc } from 'firebase/firestore';
 
-export const ListaInventario = ({material}) => {
-    const { loading, error, deleteDocument, updateDocument } = useMaterialContext();
+export const ListaInventario = ({material, instancias, handleEdit}) => {
+
+    const { loading, error, deleteDocument, updateEstadoInstancia } = useMaterialContext();
+    const { deleteFile } = useStorage();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [instancias, setInstancias] = useState([]);
-    
-    // Calcular totales y disponibles desde las instancias
+    const [disponibles, setDisponibles] = useState(0);
     const totales = instancias.length;
-    const disponibles = instancias.filter(inst => inst.estado === "disponible").length;
     
     useEffect(() => {
-        // Si el material tiene subCollection, usarla
-        if (material.subCollection && Array.isArray(material.subCollection)) {
-            setInstancias(material.subCollection);
-        }
-    }, [material]);
-
-    const handleEdit = () => {
-        // Abrir modal de edición (implementar según tu UI)
-        const nuevoNombre = prompt("Nuevo nombre:", material.nombre);
-        if (nuevoNombre && nuevoNombre !== material.nombre) {
-            updateDocument(material.id, { nombre: nuevoNombre });
-        }
-    }
+        const disponibles = instancias.filter(inst => inst.estado === "Disponible").length;
+        setDisponibles(disponibles);
+    }, []);
 
     const handleDelete = async () => {
         if (window.confirm(`¿Estás seguro de eliminar "${material.nombre}"? Esto eliminará todas las instancias.`)) {
             const result = await deleteDocument(material.id);
             if (result.success) {
+                const fotod = await deleteFile('materiales', material.imageName);
+                if (!fotod.success) {
+                    console.error("Error al eliminar la imagen: ", fotod.error);
+                }
                 alert("Material eliminado correctamente");
             } else {
                 alert("Error al eliminar: " + result.error);
             }
         }
     }
+
+    const updateInstancia = async (instId, newEstado) => {
+        try {
+            result = updateEstadoInstancia(material.id, "instancias", instId, newEstado);
+            if (!result.success) {
+                alert("Error al actualizar estado: " + result.error);
+            }
+        } catch (error) {
+            console.error("Error al actualizar estado: ", error);
+        }
+    }
+
+    useEffect(() => {
+        if (error) {
+            alert("Error: " + error);
+        }
+    }, [error]);
 
   return (
     <>
@@ -45,10 +69,19 @@ export const ListaInventario = ({material}) => {
                     onClick={() => setIsExpanded(!isExpanded)}
                     className='flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded transition-colors cursor-pointer'
                 >
-                    <h3 className='text-lg font-semibold'>{material.nombre}</h3>
+                    <div>
+                        <h3 className='text-lg font-semibold'>{material.nombre}</h3>
+                        <p>{"Estante " + material.ubicacion.estante + " Fila " + material.ubicacion.fila}</p>
+                    </div>
                     {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </button>
                 
+                 <div className='flex-1'>
+                    <span className='font-semibold'>Laboratorio: </span>
+                    <span>{material.laboratorio || "Sin laboratorio"}</span>
+                    <p>{"Fecha introducción: " + material.createdAt.toDate().toLocaleDateString()}</p>
+                </div>
+
                 <div className='flex-1'>
                     <span className='font-semibold'>Categorías: </span>
                     <span>{material.categorias?.join(", ") || "Sin categorías"}</span>
@@ -63,15 +96,18 @@ export const ListaInventario = ({material}) => {
                         <span>{totales}</span>
                     </div>
                     
-                    <button 
-                        onClick={handleEdit}
-                        className='p-2 hover:bg-blue-100 rounded transition-colors cursor-pointer'
-                        title='Editar'
-                        disabled={loading}
-                    >
-                        <Pencil size={18} className='text-blue-600' />
-                    </button>
-                    
+                    <MaterialModal loading={loading} editMode={true} existingData={{...material,totales}} onAddMaterial={handleEdit}
+                        button={
+                        <Button 
+                            className='p-2 hover:bg-blue-100 rounded transition-colors cursor-pointer'
+                            title='Editar'
+                            disabled={loading}
+                            onClick={(e) => {e.stopPropagation()}}
+                        >
+                            <Pencil size={18} className='text-blue-600' />
+                        </Button>
+                        }/>
+
                     <button 
                         onClick={handleDelete}
                         className='p-2 hover:bg-red-100 rounded transition-colors cursor-pointer'
@@ -89,19 +125,17 @@ export const ListaInventario = ({material}) => {
                     {instancias.length === 0 ? (
                         <p className='text-gray-500'>No hay instancias registradas</p>
                     ) : (
-                        <div className='grid grid-cols-3 gap-2'>
-                            {instancias.map((inst, idx) => (
-                                <div key={idx} className='p-2 bg-gray-50 rounded text-sm'>
-                                    <span className='font-mono'>{inst.sku}</span>
-                                    <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                                        inst.estado === "disponible" 
-                                            ? "bg-green-100 text-green-700" 
-                                            : "bg-gray-200 text-gray-700"
-                                    }`}>
-                                        {inst.estado}
-                                    </span>
-                                </div>
-                            ))}
+                        <div className=' flex gap-2'>
+                            <div className='grid grid-cols-3 gap-2 mr-2'>
+                                {instancias.map((inst, idx) => (
+                                    <div key={idx} className='p-2 bg-gray-50 rounded text-sm'>
+                                        <Instancias inst={inst} updateEstadoInstancia={updateInstancia} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div>
+                                <img src={material.imagenURL} alt={material.nombre} className="mt-4 max-w-xs rounded" />
+                            </div>
                         </div>
                     )}
                 </div>

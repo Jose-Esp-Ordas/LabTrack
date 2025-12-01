@@ -43,7 +43,7 @@ export const Navbar = () => {
         ) : (
           <>
               <Navlink where="/dashboard" text={`Inicio`} />
-              <Navlink where="/solicitud" text={`Pedir\n` +`Material`} />
+              <Navlink where="/solicitud" text={`Nueva\n` +`Solicitud`} />
               <Navlink where="/inventario" text={`Lista\n` +`Materiales`} />
           </>
           )}

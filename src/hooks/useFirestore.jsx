@@ -8,9 +8,9 @@ import {
     deleteDoc, 
     doc,
     orderBy,
+    getDocs
 } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
-import { Lasso } from "lucide-react";
 
 // @param {string} collectionName - Nombre de la colección de Firestore
 export const useFirestore = (collectionName) => {
@@ -69,11 +69,11 @@ export const useFirestore = (collectionName) => {
             return { success: false, error: err.message };
         }
     };
-    // Terminar una tarea  
-    const updateDocument = async (id, state) => {
+    // Actualizar un documento
+    const updateDocument = async (id, data) => {
         try {
             const docRef = doc(db, collectionName, id);
-            await updateDoc(docRef, { completed: state });
+            await updateDoc(docRef, data);
             return { success: true };
         } catch (err) {
             console.error("Error al actualizar documento: ", err);
@@ -87,9 +87,9 @@ export const useFirestore = (collectionName) => {
             let path = collectionName+"/"+data.parentId+"/"+data.subCollection;
             const docRef = await addDoc(collection(db, path), {
                 sku: data.sku,
-                lastUpdated: data.lastUpdated,
+                lastUpdated: [new Date()],
                 addedAt: new Date(),
-                estado: "disponible",
+                estado: "Disponible",
             });
             return { success: true, id: docRef.id };
         } catch (err) {
@@ -118,19 +118,19 @@ export const useFirestore = (collectionName) => {
         }
     };
 
-    //Editar en subcolección
-    const updateInSubcollection = async (parentId, subCollectionName, docId, data) => {
+    //Actualizar estado
+    const updateEstadoInstancia = async (parentId, subCollectionName, docId, newEstado) => {
         try {
             let path = collectionName+"/"+parentId+"/"+subCollectionName;
             const docRef = doc(db, path, docId);
-            await updateDoc(docRef, data);
+            await updateDoc(docRef, { estado: newEstado });
             return { success: true };
         } catch (err) {
-            console.error("Error al actualizar en subcolección: ", err);
+            console.error("Error al actualizar estado: ", err);
             return { success: false, error: err.message };
         }
     };
 
-    return { documents, loading, error, addDocument, deleteDocument, updateDocument, addToCollection, getSubcollection, updateInSubcollection };
+    return { documents, loading, error, addDocument, deleteDocument, updateDocument, addToCollection, getSubcollection, updateEstadoInstancia };
     
 };
