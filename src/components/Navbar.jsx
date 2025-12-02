@@ -36,7 +36,7 @@ export const Navbar = () => {
         {userRole === "admin" ? (
           <>
               <Navlink where="/admin/solicitudes" text={`Gestionar\n` +'Solicitudes'} />
-              <Navlink where="/inventario" text={`Gestionar\n` +'Inventario'} />
+              <Navlink where="/admin/inventario" text={`Gestionar\n` +'Inventario'} />
               <Navlink where="/admin/metricas" text={`Métricas`} />
               <Navlink where="/admin/gestion-usuarios" text={`Gestionar\n` +'Usuarios'} />
           </>

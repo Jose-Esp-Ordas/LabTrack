@@ -9,7 +9,7 @@ import { useStorage } from '@/hooks/useStorage'
 import { useState, useEffect } from 'react'
 import { BackgroundPages } from '@/components/BackgroundPages'
 
-export const Inventario = () => {
+export const InventarioAdmin = () => {
   const [filterEstado, setFilterEstado] = useState(null);
   const [filterLaboratorio, setFilterLaboratorio] = useState(null);
   const [filterCategoria, setFilterCategoria] = useState(null);
@@ -206,11 +206,11 @@ export const Inventario = () => {
   return (
     <>
       <div className="flex h-screen">
-
+        <BackgroundPages />
         <Navbar />
 
         <section className="p-4 overflow-y-hidden mx-auto w-full">
-          <BackgroundPages />
+
           <Buscador query={query} setQuery={setQuery} />
 
           <div className="mt-4 flex items-center gap-8">
@@ -259,3 +259,4 @@ export const Inventario = () => {
     </>
   )
 }
+

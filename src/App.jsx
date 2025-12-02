@@ -9,6 +9,7 @@ import { Inventario } from "./pages/Inventario"
 import { Metricas } from "./pages/Metricas"
 import { GestionUsuarios } from "./pages/GestionUsuarios"
 import { MaterialProvider } from "./context/MaterialContext"
+import { InventarioAdmin } from "./pages/InventarioAdmin"
 
 function App() {
   return (
@@ -49,7 +50,9 @@ function App() {
                 } 
               />
 
+
               {/* Rutas protegidas por rol */}
+              
               <Route 
                 path="/admin/solicitudes" 
                 element={
@@ -59,6 +62,15 @@ function App() {
                 } 
               />
 
+              <Route 
+                path="/admin/inventario" 
+                element={
+                  <ProtectedRoute requireAdmin={true}>
+                    <InventarioAdmin />
+                  </ProtectedRoute>
+                } 
+              />
+              
               <Route 
                 path="/admin/metricas" 
                 element={

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
+import { Background } from "@/components/Background";
 
 export const Auth = () => {
     const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export const Auth = () => {
     const { login, userRole, Register } = useAuthContext();
     const navigate = useNavigate();
     const [pendingRedirect, setPendingRedirect] = useState(false);
+    
 
     useEffect(() => {
         if (!pendingRedirect) return;
@@ -58,13 +60,13 @@ export const Auth = () => {
     return (
         <>
         <div className=" flex h-screen align-middle items-center text-center">
-            <div className="w-1/2 mx-auto mt-10 p-6 border border-gray-300 rounded-lg shadow-md">
+            <div className="w-3/12 mt-10 p-6 border border-gray-300 rounded-lg shadow-md items-center mx-auto">
                 <h2 className="text-2xl font-bold mb-0 text-center mr-20">{registerMode ? "Un registro," :"Inicio de Sesión"}</h2>
                 <span className="text-2xl font-bold mb-6 text-center ml-20">{registerMode? "una experiencia": ""}</span>
                 <div>
                     <span className="text-md font-medium mb-6 text-center">{registerMode ? "Volver a:"  : "Si no cuentas con un perfil"}</span>
                     <span
-                        className="text-md font-medium mb-6 text-center text-amber-600 cursor-pointer"
+                        className="text-md font-medium mb-6 text-center text-indigo-600 cursor-pointer"
                         onClick={() => setRegisterMode(!registerMode)}
                     >
                         {" "}{registerMode ? "Inicio de Sesión" : "Regístrate Aquí"}
@@ -107,15 +109,15 @@ export const Auth = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-amber-600 text-white py-2 rounded hover:bg-amber-700 transition-colors"
+                        className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
                         disabled={loading}
                     >
                         {loading ? "Cargando..." : "Iniciar Sesión"}
                     </button>
                 </form>
             </div>
-            <div className="w-1/2">
-                <p>dw</p>
+            <div className="w-1/2 text-left relative h-200 flex items-center">
+                <Background />
             </div>
         </div>
         </>

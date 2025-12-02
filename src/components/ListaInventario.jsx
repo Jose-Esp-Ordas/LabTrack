@@ -8,7 +8,7 @@ import { Instancias } from './Instancias';
 
 export const ListaInventario = ({material, instancias, handleEdit, userRole}) => {
 
-    const { loading, error, deleteDocument, updateEstadoInstancia } = useMaterialContext();
+    const { loading, error, deleteDocument, updateEstadoInstancia, deleteInstance } = useMaterialContext();
     const { deleteFile } = useStorage();
     const [isExpanded, setIsExpanded] = useState(false);
     const [disponibles, setDisponibles] = useState(instancias.filter(inst => inst.estado === "Disponible").length);
@@ -16,7 +16,9 @@ export const ListaInventario = ({material, instancias, handleEdit, userRole}) =>
     
     const handleDelete = async () => {
         if (window.confirm(`¿Estás seguro de eliminar "${material.nombre}"? Esto eliminará todas las instancias.`)) {
+            const promises = instancias.map(inst => deleteInstance(material.id, "instancias", inst.id));
             const result = await deleteDocument(material.id);
+            await Promise.all(promises);
             if (result.success) {
                 const fotod = await deleteFile('materiales', material.imageName);
                 if (!fotod.success) {
@@ -53,7 +55,7 @@ export const ListaInventario = ({material, instancias, handleEdit, userRole}) =>
 
   return (
     <>
-        <div className='border border-gray-300 rounded-lg p-4 shadow-md mb-2'>
+        <div className='border border-gray-300 rounded-lg p-4 shadow-md mb-3 bg-white'>
             <div className='flex items-center gap-4'>
                 <button 
                     onClick={() => setIsExpanded(!isExpanded)}

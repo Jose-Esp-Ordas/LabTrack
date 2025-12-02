@@ -6,7 +6,7 @@ export const Tabs = ({title, abierto=true, items=[], }) => {
     const [active, setActive] = useState(abierto);
   return (
     <>
-        <div className={"mb-4 border-b border-gray-200 cursor-pointer border-t border-t-blue-950 w-full px-auto" + (!active && " bg-stone-100" )}>
+        <div className={"mb-4 border-b border-gray-200 bg-white cursor-pointer border-t border-t-blue-950 w-full px-auto" + (!active && " bg-stone-100" )}>
             <div  onClick={() => setActive(!active)}>
                 <div className="flex justify-between items-center p-4">
                     <h3 className="text-xl font-semibold mb-2">{title}</h3>

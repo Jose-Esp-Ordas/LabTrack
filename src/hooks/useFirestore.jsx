@@ -8,7 +8,7 @@ import {
     deleteDoc, 
     doc,
     orderBy,
-    getDocs
+    getDocs,
 } from "firebase/firestore";
 import { db } from "../firebase/Firebase";
 
@@ -137,6 +137,18 @@ export const useFirestore = (collectionName) => {
         }
     };
 
-    return { documents, loading, error, addDocument, deleteDocument, updateDocument, addToCollection, getSubcollection, updateEstadoInstancia };
+    //Borrar instancia
+    const deleteInstance = async (parentId, subCollectionName, docId) => {
+        try {
+            let path = collectionName+"/"+parentId+"/"+subCollectionName;
+            await deleteDoc(doc(db, path, docId));
+            return { success: true };
+        } catch (err) {
+            console.error("Error al eliminar instancia: ", err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    return { documents, loading, error, addDocument, deleteDocument, updateDocument, addToCollection, getSubcollection, updateEstadoInstancia, deleteInstance };
     
 };
