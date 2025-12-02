@@ -11,7 +11,7 @@ export const Solicitud = ({FechaI = "Lunes 12:30 pm", FechaF="Lunes 12:30 pm", E
         const { userRole } = useAuthContext();
   return (
     <>
-        <div className='border border-gray-300 rounded-lg p-4 shadow-md flex flex-col gap-4'>
+        <div className='border border-gray-300 rounded-lg p-4 shadow-md flex flex-col gap-4 bg-white'>
 
             <div className="flex w-full items-start gap-8 min-w-0 align-middle">
                 <h4 className="text-lg font-semibold mb-2 shrink-0">Fecha Inicio</h4>

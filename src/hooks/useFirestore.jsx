@@ -90,6 +90,7 @@ export const useFirestore = (collectionName) => {
                 lastUpdated: [new Date()],
                 addedAt: new Date(),
                 estado: "Disponible",
+                prestamos: 0
             });
             return { success: true, id: docRef.id };
         } catch (err) {
@@ -111,6 +112,8 @@ export const useFirestore = (collectionName) => {
                 id: doc.id,
                 ...doc.data()
             }));
+            //Sorteamos por menor cantidad de prestamos
+            docs.sort((a,b) => a.prestamos - b.prestamos);
             return { success: true, documents: docs };
         } catch (err) {
             console.error("Error al obtener subcolección: ", err);

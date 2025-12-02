@@ -59,7 +59,7 @@ export const Background = () => {
                                     width: '120px',
                                     height: '120px',
                                     opacity: 0,
-                                    right: `calc(50% + ${Math.cos(angle) * radius}px - ${10*i}px)`,
+                                    right: `calc(50% + ${Math.cos(angle) * radius}px - ${5*i}px)`,
                                     bottom: `calc(50% + ${Math.sin(angle) * radius}px - ${20*i}px)`,
                                 }}
                             />
@@ -68,7 +68,7 @@ export const Background = () => {
                 {/* Título con efecto de fade-in */}
                 <h2 
                     ref={titleRef}
-                    className="text-6xl font-extrabold bg-linear-to-r from-indigo-500 to-indigo-800 bg-clip-text text-transparent relative z-10 opacity-0"
+                    className="text-6xl font-extrabold bg-linear-to-r from-indigo-500 to-indigo-800 bg-clip-text text-transparent relative z-10 opacity-0 mr-24"
                 >
                     LabTrack
                 </h2>
