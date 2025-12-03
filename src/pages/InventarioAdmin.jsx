@@ -19,7 +19,7 @@ export const InventarioAdmin = () => {
   const { addDocument, addToCollection, loading, documents, getSubcollection, updateDocument } = useMaterialContext();
   
   const [filteredMaterials, setFilteredMaterials] = useState([]);
-  
+  const [materiales, setMateriales] = useState([]);
   const [query, setQuery] = useState('');
   const [laboratorios, setLaboratorios] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -59,15 +59,21 @@ export const InventarioAdmin = () => {
     if (documents.length > 0) {
       setPending(true);
       fetchAllInstances();
-      let filtered = filteredMaterials;
+      
 
-      // Filtrar por búsqueda
-      if (query.trim() !== '') {
-        const lowerQuery = query.trim().toLowerCase();
-        filtered = filtered.filter(material => 
-          material.nombre?.toLowerCase().includes(lowerQuery)
-        );
-      }
+      setPending(false);
+
+    } else {
+      setMateriales([]);
+      setLaboratorios([]);
+      setCategorias([]);
+      setPending(false);
+    }
+  }, [ documents]);
+
+  useEffect(() => {
+    // Filtrar por búsqueda
+      let filtered = filteredMaterials;
 
       // Filtrar por estado
       if (filterEstado && filterEstado !== "Todos") {
@@ -96,17 +102,15 @@ export const InventarioAdmin = () => {
         );
       }
 
-      setFilteredMaterials(filtered);
-      setPending(false);
-
-    } else {
-      setMateriales([]);
-      setLaboratorios([]);
-      setCategorias([]);
-      setPending(false);
-    }
-  }, [ filterEstado, filterLaboratorio, filterCategoria, query, documents]);
-
+      if (query.trim() !== '') {
+        const lowerQuery = query.trim().toLowerCase();
+        filtered = filtered.filter(material => 
+          material.nombre?.toLowerCase().includes(lowerQuery)
+        );
+      }
+      setMateriales(filtered);
+      
+  }, [query, filteredMaterials, filterEstado, filterLaboratorio, filterCategoria]);
 
   const handleAddMaterial = async (materialData, childrenData, imagen) => {
     // Verificar si ya existe un material con el mismo nombre
@@ -243,7 +247,7 @@ export const InventarioAdmin = () => {
             ) : documents.length === 0 ? (
               <p>No hay materiales en el inventario.</p>
             ) : (
-              filteredMaterials.map((material) => (
+              materiales.map((material) => (
                 <ListaInventario
                   key={material.id}
                   material={material}
