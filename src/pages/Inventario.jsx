@@ -114,7 +114,7 @@ export const Inventario = () => {
 
         <Navbar />
 
-        <section className="p-16 overflow-y-hidden mx-auto w-full">
+        <section className="px-10 py-6 overflow-y-hidden mx-auto w-full">
           <BackgroundPages />
           <Buscador query={query} setQuery={setQuery} />
 

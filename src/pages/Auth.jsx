@@ -60,7 +60,7 @@ export const Auth = () => {
     return (
         <>
         <div className=" flex h-screen align-middle items-center text-center">
-            <div className="w-3/12 mt-10 p-6 border border-gray-300 rounded-lg shadow-md items-center mx-auto">
+            <div className="w-1/3 mt-10 p-6 border border-gray-300 rounded-lg shadow-md items-center mx-auto">
                 <h2 className={"text-2xl font-bold mb-0 text-center " + (registerMode && "mr-20")}>{registerMode ? "Un registro," :"Inicio de Sesión"}</h2>
                 <span className="text-2xl font-bold mb-6 text-center ml-20">{registerMode? "una experiencia": ""}</span>
                 <div>

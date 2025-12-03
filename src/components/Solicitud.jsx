@@ -2,7 +2,7 @@ import React, { use } from 'react'
 import { useAuthContext } from '@/context/AuthContext'
 import { useMaterialContext } from '@/context/MaterialContext';
 import { useSolicitud } from '@/hooks/useSolicitud';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../firebase/Firebase';
 
 export const Solicitud = ({item}) => {
@@ -45,17 +45,30 @@ export const Solicitud = ({item}) => {
         }
         const result = await actualizarEstadoSolicitud(solicitudId, nuevoEstado);
         if (result.success) {
+            notificarUsuario(`Su solicitud ha sido actualizada a: ${nuevoEstado}`);
             console.log("Estado actualizado correctamente");
         } else {
             alert("Error al actualizar estado: " + result.error);
         }
     }
+
     const actualizarUsuario = async () => {
         const userDoc = await getDoc(doc(db, "users", user.uid))
         if (userDoc.exists()) {
             const faltasActualizadas = (userDoc.data().faltas || 0) + 1;
             await updateDoc(doc(db, "users", user.uid), { faltas: faltasActualizadas });
         }
+    }
+
+    const notificarUsuario = async(mensaje) => {
+        // Notificar al usuario de la solicitud, no al admin que hace el cambio
+        const usuarioSolicitudId = item.userId;
+        let path = "users"+"/"+usuarioSolicitudId+"/"+"notificaciones";
+        const docRef = await addDoc(collection(db, path), {
+            mensaje: mensaje,
+            leido: false,
+            timestamp: new Date()
+        });
     }
 
   return (
