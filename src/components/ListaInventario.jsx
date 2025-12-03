@@ -111,18 +111,7 @@ export const ListaInventario = ({material, instancias, handleEdit, userRole}) =>
                             </button>
                         </>
                     )}
-                    {userRole !== "admin" && (
-                        <>
-                        <button 
-                                onClick={() => {}}
-                                className='p-2 hover:bg-red-100 rounded transition-colors cursor-pointer'
-                                title='add'
-                                disabled={loading}
-                            >
-                                <CirclePlus size={18} className='text-blue-600' />
-                            </button>
-                        </>
-                    )}
+                    
                 </div>
             </div>
             
@@ -141,7 +130,7 @@ export const ListaInventario = ({material, instancias, handleEdit, userRole}) =>
                                 ))}
                             </div>
                             <div>
-                                <img src={material.imagenURL} alt={material.nombre} className="mt-4 max-w-xs rounded" />
+                                <img src={material.imagenURL} alt={material.nombre} className="pl-4 max-w-xs rounded" />
                             </div>
                         </div>
                     )}

@@ -108,108 +108,13 @@ export const Inventario = () => {
   }, [ filterEstado, filterLaboratorio, filterCategoria, query, documents]);
 
 
-  const handleAddMaterial = async (materialData, childrenData, imagen) => {
-    // Verificar si ya existe un material con el mismo nombre
-    const nombreNormalizado = materialData.nombre.trim().toLowerCase();
-    const duplicado = documents.find(
-      doc => doc.nombre?.trim().toLowerCase() === nombreNormalizado
-    );
-    
-    if (duplicado) {
-      alert(`Ya existe un material con el nombre "${materialData.nombre}". Por favor, usa un nombre diferente.`);
-      return { success: false, error: "Material duplicado" };
-    }
-    
-    let result = await addDocument(materialData);
-    
-    if (result.success) {
-      // añadir imagen si existe
-      if (imagen) {
-        const uploadResult = await uploadFile(imagen, 'materiales');
-        if (uploadResult.success) {
-          // actualizar documento con la URL de la imagen
-          await materialContext.updateDocument(result.id, {"imagenURL": uploadResult.url});
-        } else {
-          console.error("Error al subir la imagen: ", uploadResult.error);
-          return { success: false, error: "Error al subir la imagen" };
-        }
-      }
-      
-      
-      
-      // Crear instancias individuales con SKU personalizado
-      const promises = [];
-      
-      for (let i = 1; i <= childrenData.cantidad; i++) {
-        const sku = `${result.id}-${String(i).padStart(3, '0')}`;
-        const instanciaData = {
-          parentId: result.id,
-          subCollection: "instancias",
-          sku: sku,
-        };
-        promises.push(addToCollection(instanciaData));
-      }
-      
-      // Esperar a que todas las instancias se creen
-      const results = await Promise.all(promises);
-      const allSuccess = results.every(r => r.success);
-      
-      if (allSuccess) {
-        alert("Material y sus instancias creadas exitosamente.");
-        return { success: true, materialId: result.id };
-      } else {
-        return { success: false, error: "Algunas instancias no se pudieron crear" };
-      }
-    } else {
-      return { success: false, error: result.error };
-    }
-  };
-  
-  const handleEdit = async (payload) => {
-        if (payload.imagen) {
-            // Si hay una nueva imagen, subirla y obtener la URL
-            const uploadResult = await uploadFile(payload.imagen, 'materiales');
-            if (uploadResult.success) {
-                payload.materialData.imagenURL = uploadResult.url;
-            } else {
-                alert("Error al subir la imagen: " + uploadResult.error);
-                return;
-            }
-        }
-        if (payload.cantidad) {
-            // Crear instancias individuales con SKU personalizado
-            const promises = [];
-            
-            for (let i = 1; i <= payload.cantidad.extras; i++) {
-                const sku = `${ payload.id}-${String(i+payload.cantidad.antes).padStart(3, '0')}`;
-                const instanciaData = {
-                parentId: payload.id,
-                subCollection: "instancias",
-                sku: sku,
-                };
-                promises.push(addToCollection(instanciaData));
-            }
-            
-            // Esperar a que todas las instancias se creen
-            const results = await Promise.all(promises);
-                
-        }
-  
-        const result = await updateDocument(payload.id, {...payload.materialData});
-        if (result.success) {
-            alert("Material actualizado correctamente");
-        } else {
-            alert("Error al actualizar material: " + result.error);
-        }
-  };
-
   return (
     <>
       <div className="flex h-screen">
 
         <Navbar />
 
-        <section className="p-4 overflow-y-hidden mx-auto w-full">
+        <section className="p-16 overflow-y-hidden mx-auto w-full">
           <BackgroundPages />
           <Buscador query={query} setQuery={setQuery} />
 
@@ -230,11 +135,6 @@ export const Inventario = () => {
               title="Categoría" 
               onFilterChange={setFilterCategoria}
             />
-            {userRole === "admin" && (
-              <div className='ml-auto'>
-                <MaterialModal onAddMaterial={handleAddMaterial} loading={loading} />
-              </div>
-            )}
           </div>
 
           <div className="mt-6 overflow-y-auto h-[75vh]">
@@ -248,7 +148,6 @@ export const Inventario = () => {
                   key={material.id}
                   material={material}
                   instancias={material.instancias || []}
-                  handleEdit={handleEdit}
                   userRole={userRole}
                 />
               ))

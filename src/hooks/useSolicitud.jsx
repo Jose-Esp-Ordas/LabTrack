@@ -7,7 +7,7 @@ export const useSolicitud = () => {
         const result = await addDocument({
             ...solicitudData,
             userId: userId,
-            estado: "Pendiente"
+            estado: "Revision",
         });
         return result;
     };
@@ -23,7 +23,7 @@ export const useSolicitud = () => {
     const obtenerSolicitudes = (userId = null) => {
         if (userId) {
             // Filtrar por usuario específico
-            return documents.filter(doc => doc.userId === userId);
+            return documents.filter(doc => doc.userId == userId);
         }
         // Retornar todas las solicitudes
         return documents;

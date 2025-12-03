@@ -72,16 +72,26 @@ export const Solicitud = () => {
   }
 
   const actualizarInstancias = ({matId, instId}) => {
-    updateEstadoInstancia(matId, "instancias", instId, "Pendiente");
+    updateEstadoInstancia(matId, "instancias", instId, "Prestado");
   }
 
   const handleCrearSolicitud = async () => {
     let solicitudes = obtenerSolicitudes(user.uid);
     
-    if (solicitudes.some(solicitud => solicitud.estado === "Pendiente" || solicitud.estado === "Aprobada")) {
+    if (solicitudes.some(solicitud => solicitud.estado === "Revision" || solicitud.estado === "Entrega" || solicitud.estado === "Devolucion")) {
       alert("Ya tienes una solicitud pendiente o aprobada. No puedes crear una nueva hasta que se resuelva la actual.");
       return;
-    }    
+    }
+    
+    if (user?.estado === "Deuda") {
+      alert("No puedes crear una solicitud debido a que tienes deudas pendientes.");
+      return;
+    }
+
+    if(user?.faltas > 3) {
+      alert("No puedes crear una solicitud debido a que estás sancionado.");
+      return;
+    }
 
     // verificaciones
     if (filteredMaterials.length === 0) {
@@ -128,8 +138,6 @@ export const Solicitud = () => {
         alert("Solicitud creada con éxito.");
         navigate('/dashboard');
       }
-    
-    console.log("Solicitud creada con los siguientes materiales:", filteredMaterials);
   }
 
   return (
@@ -141,18 +149,18 @@ export const Solicitud = () => {
           <h3 className="text-3xl font-bold mb-4">Búsqueda de material:</h3>
           <Buscador query={query} setQuery={setQuery} />
           <div className='flex gap-2'>
-            {materiales.map((material, index) => (
+            {materiales.length > 0 ? materiales.map((material, index) => (
               <Resultados key={index} index={index} material={material} onAdd={() => handleAddToSolicitud(material)} />
-            ))}
+            )) : <p className='my-1 text-center w-full'>No hay materiales disponibles.</p>}
           </div>
           <div className='mt-4 mb-32 border-t pt-4'>
-             <div className='grid items-start gap-2 w-full min-w-0 bg-white' style={{ gridTemplateColumns: 'max-content 1fr max-content' }}>
+             <div className='flex flex-col gap-4 w-full bg-white'>
                 {filteredMaterials.length > 0 ? (filteredMaterials.map((item, idx) => (
-                    <React.Fragment key={idx}>
-                        <p className="min-w-0 wrap-break-word whitespace-normal text-lg">{item.nombre}</p>
+                    <div key={idx} className='grid items-center gap-4 w-full' style={{ gridTemplateColumns: '1fr auto auto' }}>
+                        <p className="text-lg break-words">{item.nombre}</p>
                         <Input 
                           type="number"
-                          className='whitespace-nowrap max-w-20 right-80 fixed'
+                          className='w-20'
                           value={item.cantidad}
                           min={1}
                           max={item.disponible}
@@ -167,11 +175,11 @@ export const Solicitud = () => {
                         />
                         <button
                           onClick={() => handleRemoveFromSolicitud(item)}
-                          className={"bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded ml-auto cursor-pointer"}
+                          className={"bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"}
                         >
                           Eliminar
                         </button>
-                    </React.Fragment>
+                    </div>
                 ))) : <p className='text-2xl '>Empieza agregando un material</p>}
             </div>
           </div>

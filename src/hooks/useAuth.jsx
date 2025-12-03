@@ -38,7 +38,9 @@ export const useAuth = () => {
       await setDoc(doc(db, "users", userCredential.user.uid), { 
         role: role,
         email: email,
-        createdAt: new Date()
+        createdAt: new Date(),
+        faltas: 0,
+        estado: "activo"
       });
       setUserRole(role)
       setLoading(false)

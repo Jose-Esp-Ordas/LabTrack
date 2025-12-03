@@ -128,7 +128,7 @@ export const InventarioAdmin = () => {
         const uploadResult = await uploadFile(imagen, 'materiales');
         if (uploadResult.success) {
           // actualizar documento con la URL de la imagen
-          await materialContext.updateDocument(result.id, {"imagenURL": uploadResult.url});
+          await updateDocument(result.id, {"imagenURL": uploadResult.url});
         } else {
           console.error("Error al subir la imagen: ", uploadResult.error);
           return { success: false, error: "Error al subir la imagen" };
@@ -141,7 +141,7 @@ export const InventarioAdmin = () => {
       const promises = [];
       
       for (let i = 1; i <= childrenData.cantidad; i++) {
-        const sku = `${result.id}-${String(i).padStart(3, '0')}`;
+        const sku = `${result.id.slice(0, 8)}-${String(i).padStart(3, '0')}`;
         const instanciaData = {
           parentId: result.id,
           subCollection: "instancias",
@@ -209,7 +209,7 @@ export const InventarioAdmin = () => {
         <BackgroundPages />
         <Navbar />
 
-        <section className="p-4 overflow-y-hidden mx-auto w-full">
+        <section className="p-16 overflow-y-hidden mx-auto w-full">
 
           <Buscador query={query} setQuery={setQuery} />
 
