@@ -30,7 +30,7 @@ import {
 export const GestionUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [filteredUsuarios, setFilteredUsuarios] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(''); // <-- cambiado de "query"
+  const [searchQuery, setSearchQuery] = useState(''); 
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
   const [editFaltas, setEditFaltas] = useState(0);
@@ -38,7 +38,7 @@ export const GestionUsuarios = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const q = query(collection(db, "users"), where("role", "==", "user")); // ya no choca con el estado
+    const q = query(collection(db, "users"), where("role", "==", "user"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const users = snapshot.docs.map((doc) => ({
