@@ -146,7 +146,7 @@ export const Solicitud = () => {
         <Navbar />
         <section className="pt-8 px-14 overflow-y-hidden mx-auto w-full">
           <BackgroundPages />
-          <h3 className="text-3xl font-bold mb-4">Búsqueda de material:</h3>
+
           <Buscador query={query} setQuery={setQuery} />
           <div className='flex gap-2'>
             {materiales.length > 0 ? materiales.map((material, index) => (
@@ -154,7 +154,7 @@ export const Solicitud = () => {
             )) : <p className='my-1 text-center w-full'>No hay materiales disponibles.</p>}
           </div>
           <div className='mt-4 mb-32 border-t pt-4'>
-             <div className='flex flex-col gap-4 w-full bg-white overflox-y-auto max-h-96 p-4 '>
+             <div className='flex flex-col gap-2 w-full bg-white overflow-y-auto max-h-96 p-4 '>
                 {filteredMaterials.length > 0 ? (filteredMaterials.map((item, idx) => (
                     <div key={idx} className='grid items-center gap-4 w-full' style={{ gridTemplateColumns: '1fr auto auto' }}>
                         <p className="text-lg break-words">{item.nombre}</p>
