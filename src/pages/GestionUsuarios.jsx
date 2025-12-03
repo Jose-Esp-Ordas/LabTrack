@@ -81,9 +81,13 @@ export const GestionUsuarios = () => {
 
     try {
       const userRef = doc(db, "users", editingUser.id);
+      const faltasNum = Number(editFaltas) || 0;
+      // regla: si faltas > 1 -> deudor
+      const computedEstado = faltasNum > 1 ? 'deudor' : editEstado || 'activo';
+
       await updateDoc(userRef, {
-        faltas: Number(editFaltas),
-        estado: editEstado
+        faltas: faltasNum,
+        estado: computedEstado
       });
 
       setOpen(false);
@@ -93,6 +97,7 @@ export const GestionUsuarios = () => {
       alert("Error al actualizar usuario: " + error.message);
     }
   };
+
 
   const UserCard = ({ user }) => {
     const username = user.email?.split('@')[0] || 'Usuario';
@@ -213,6 +218,9 @@ export const GestionUsuarios = () => {
                       </DropdownMenuRadioItem>
                       <DropdownMenuRadioItem value="inactivo" className="cursor-pointer">
                         inactivo
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="deudor" className="cursor-pointer">
+                        deudor
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
